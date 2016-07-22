@@ -1,0 +1,53 @@
+#!/bin/sh
+
+_PATH=/sys/class/power_supply/AC/online
+_STATUS=`cat $_PATH` # 1 when plugged
+_ACTIVE=`systemctl is-active wakelock.service`
+
+
+function _off() {
+ echo 'Wakelock OFF'
+ systemctl stop wakelock.service
+}
+
+function _on() {
+ echo 'Wakelock ON'
+ systemctl start wakelock.service
+}
+  
+function _toggle() {
+  if test $_ACTIVE == "active"
+  then
+    _off
+  else
+    _on
+  fi
+}
+
+case $1 in
+  on|ac|power)
+    _on
+    ;;
+  off|battery|bat)
+    _off
+    ;;
+  switch|toggle|force)
+    _toggle
+    ;;
+  check|status)
+    echo $_ACTIVE
+    ;;
+  watch|forever|inhibit)
+    systemd-inhibit --what=handle-lid-switch --who=root --why=Wakelock --mode=block /bin/sh -c 'while :;do :; done' 
+    ;;
+  detect|auto|*)
+    echo 'Autodetect...'
+    if test $_STATUS -eq 1
+    then
+      _on
+    else
+      _off
+    fi
+    ;;
+esac
+exit 0

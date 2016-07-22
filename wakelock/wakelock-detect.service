@@ -1,0 +1,9 @@
+[Unit]
+Description=Wakelock boot-time hook
+After=dbus.service
+
+[Service]
+ExecStart=/usr/local/bin/wakelock
+
+[Install]
+WantedBy=multi-user.target

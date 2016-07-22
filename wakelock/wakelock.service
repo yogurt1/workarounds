@@ -1,0 +1,6 @@
+[Unit]
+Description=Wakelock
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/wakelock inhibit
